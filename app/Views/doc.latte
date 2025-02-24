@@ -1,0 +1,340 @@
+{layout layouts/main.latte}
+{varType string $title}
+{var string $token = '{token}'}
+
+{block content}
+
+<div class="bg-light py-5">
+    <div class="container my-4">
+        <!-- Titre principal -->
+        <h1 class="display-4 text-primary fw-bold mb-3">Documentation de l’API</h1>
+        <p class="text-secondary mb-5">Voici la liste des routes disponibles, leurs paramètres et les réponses JSON attendues.</p>
+
+        <!-- Table des matières -->
+        <div class="mb-5">
+            <h2 class="h5 text-uppercase text-muted mb-3">Sommaire</h2>
+            <ul class="list-group list-group-flush">
+                <li class="list-group-item ps-0 border-0">
+                    <a href="#login" class="text-decoration-none text-primary">1. /login</a>
+                </li>
+                <li class="list-group-item ps-0 border-0">
+                    <a href="#profile" class="text-decoration-none text-primary">2. /profile/{$token}</a>
+                </li>
+                <li class="list-group-item ps-0 border-0">
+                    <a href="#profile-password" class="text-decoration-none text-primary">3. /profile/{$token}/password</a>
+                </li>
+                <li class="list-group-item ps-0 border-0">
+                    <a href="#profile-credits" class="text-decoration-none text-primary">4. /profile/{$token}/credits</a>
+                </li>
+                <li class="list-group-item ps-0 border-0">
+                    <a href="#profile-transactions" class="text-decoration-none text-primary">5. /profile/{$token}/transactions</a>
+                </li>
+                <li class="list-group-item ps-0 border-0">
+                    <a href="#profile-elevate" class="text-decoration-none text-primary">6. /profile/{$token}/elevate</a>
+                </li>
+            </ul>
+        </div>
+
+        <!-- 1) /login -->
+        <section class="mb-5" id="login">
+            <h2 class="h4 text-dark border-bottom pb-2 mb-3">
+                <i class="fas fa-sign-in-alt me-2 text-info"></i>/login
+                <span class="badge bg-danger ms-2">POST</span>
+            </h2>
+            <p>Permet de s’authentifier et de recevoir un jeton (token) à usage unique.</p>
+
+            <h5 class="text-primary mt-4">Paramètres (POST)</h5>
+            <ul class="ms-4">
+                <li><code>username</code> (string) — Nom d’utilisateur</li>
+                <li><code>password</code> (string) — Mot de passe</li>
+            </ul>
+
+            <div class="row mt-4 g-4">
+                <!-- Succès -->
+                <div class="col-md-6">
+                    <div class="border rounded p-3 shadow-sm bg-white">
+                        <h6 class="text-success mb-2">
+                            <i class="fas fa-check-circle me-1"></i>Succès (200)
+                        </h6>
+                        <pre class="code-block"><code>{
+  "token": "abc123def456...",
+  "message": "Authentication réussie"
+}</code></pre>
+                    </div>
+                </div>
+                <!-- Erreur -->
+                <div class="col-md-6">
+                    <div class="border rounded p-3 shadow-sm bg-white">
+                        <h6 class="text-danger mb-2">
+                            <i class="fas fa-times-circle me-1"></i>Erreur (404)
+                        </h6>
+                        <pre class="code-block"><code>{
+  "message": "Identifiants d'authentification invalides."
+}</code></pre>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="mb-5" id="profile">
+            <h2 class="h4 text-dark border-bottom pb-2 mb-3">
+                <i class="fas fa-user-circle me-2 text-info"></i>/profile/{$token}
+            </h2>
+
+            <article class="mb-4">
+                <h3 class="h6 border-bottom pb-1 text-secondary">
+                    GET /profile/{$token}
+                    <span class="badge bg-primary ms-2">GET</span>
+                </h3>
+                <p>Obtient les informations du profil associé au jeton.</p>
+                <ul class="ms-4">
+                    <li><code>{$token}</code> (usage unique)</li>
+                </ul>
+
+                <div class="row mt-3 g-4">
+                    <div class="col-md-6">
+                        <div class="border rounded p-3 shadow-sm bg-white">
+                            <h6 class="text-success mb-2"><i class="fas fa-check-circle me-1"></i>Succès (200)</h6>
+                            <pre class="code-block"><code>{
+  "token": "nouveauJeton...",
+  "username": "jarrache",
+  "firstname": "Jean",
+  "lastname": "Arrache",
+  "email": "jean@test.com",
+  "balance": 400,
+  "type": "premium"
+}</code></pre>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="border rounded p-3 shadow-sm bg-white">
+                            <h6 class="text-danger mb-2"><i class="fas fa-times-circle me-1"></i>Erreur (400)</h6>
+                            <pre class="code-block"><code>{
+  "message": "Jeton invalide."
+}</code></pre>
+                        </div>
+                    </div>
+                </div>
+            </article>
+
+            <article>
+                <h3 class="h6 border-bottom pb-1 text-secondary">
+                    PUT /profile/{$token}
+                    <span class="badge bg-primary ms-2">PUT</span>
+                </h3>
+                <p>Modifie le nom, prénom, courriel et nom d’utilisateur du profil.</p>
+                <h6 class="text-primary">Paramètres (PUT)</h6>
+                <ul class="ms-4">
+                    <li><code>firstname</code> — Nouveau prénom</li>
+                    <li><code>lastname</code> — Nouveau nom</li>
+                    <li><code>email</code> — Nouveau courriel</li>
+                    <li><code>username</code> — Nouveau nom d’utilisateur</li>
+                </ul>
+
+                <div class="row mt-3 g-4">
+                    <div class="col-md-6">
+                        <div class="border rounded p-3 shadow-sm bg-white">
+                            <h6 class="text-success mb-2"><i class="fas fa-check-circle me-1"></i>Succès (200)</h6>
+                            <pre class="code-block"><code>{
+  "token": "nouveauJeton...",
+  "message": "Profil modifié avec succès."
+}</code></pre>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="border rounded p-3 shadow-sm bg-white">
+                            <h6 class="text-danger mb-2"><i class="fas fa-times-circle me-1"></i>Erreur (400)</h6>
+                            <pre class="code-block"><code>{
+  "message": "Le courriel est invalide."
+}</code></pre>
+                        </div>
+                    </div>
+                </div>
+            </article>
+        </section>
+
+        <section class="mb-5" id="profile-password">
+            <h2 class="h4 text-dark border-bottom pb-2 mb-3">
+                <i class="fas fa-key me-2 text-info"></i>/profile/{$token}/password
+                <span class="badge bg-primary ms-2">PUT</span>
+            </h2>
+            <p>Modifie uniquement le mot de passe (en fournissant l’ancien mot de passe).</p>
+            <ul class="ms-4">
+                <li><code>old_password</code> — Ancien mot de passe</li>
+                <li><code>new_password</code> — Nouveau mot de passe</li>
+            </ul>
+
+            <div class="row mt-3 g-4">
+                <div class="col-md-6">
+                    <div class="border rounded p-3 shadow-sm bg-white">
+                        <h6 class="text-success mb-2"><i class="fas fa-check-circle me-1"></i>Succès (200)</h6>
+                        <pre class="code-block"><code>{
+  "token": "nouveauJeton...",
+  "message": "Mot de passe modifié avec succès."
+}</code></pre>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="border rounded p-3 shadow-sm bg-white">
+                        <h6 class="text-danger mb-2"><i class="fas fa-times-circle me-1"></i>Erreur (400)</h6>
+                        <pre class="code-block"><code>{
+  "message": "L'ancien mot de passe est invalide."
+}</code></pre>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="mb-5" id="profile-credits">
+            <h2 class="h4 text-dark border-bottom pb-2 mb-3">
+                <i class="fas fa-money-bill-wave me-2 text-info"></i>/profile/{$token}/credits
+                <span class="badge bg-primary ms-2">POST</span>
+            </h2>
+            <p>Ajoute des crédits à l’utilisateur. Limites selon le type du compte.</p>
+            <ul class="ms-4">
+                <li><code>credit</code> (float) — Montant à ajouter</li>
+            </ul>
+            <p class="text-muted">Type NORMAL : max 500 $ par requête<br/>Type PREMIUM : max 2000 $ par requête</p>
+
+            <div class="row mt-3 g-4">
+                <div class="col-md-6">
+                    <div class="border rounded p-3 shadow-sm bg-white">
+                        <h6 class="text-success mb-2"><i class="fas fa-check-circle me-1"></i>Succès (200)</h6>
+                        <pre class="code-block"><code>{
+  "token": "nouveauJeton...",
+  "message": "Crédits ajoutés avec succès."
+}</code></pre>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="border rounded p-3 shadow-sm bg-white">
+                        <h6 class="text-danger mb-2"><i class="fas fa-times-circle me-1"></i>Erreur (400)</h6>
+                        <pre class="code-block"><code>{
+  "message": "Montant invalide ou trop élevé pour ce compte."
+}</code></pre>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="mb-5" id="profile-transactions">
+            <h2 class="h4 text-dark border-bottom pb-2 mb-3">
+                <i class="fas fa-shopping-cart me-2 text-info"></i>/profile/{$token}/transactions
+            </h2>
+
+            <article class="mb-4">
+                <h3 class="h6 border-bottom pb-1 text-secondary">
+                    POST /profile/{$token}/transactions
+                    <span class="badge bg-primary ms-2">POST</span>
+                </h3>
+                <p>Effectue une transaction d’achat (price * quantity ≤ balance).</p>
+                <ul class="ms-4">
+                    <li><code>name</code> (string) — Nom de l’article</li>
+                    <li><code>price</code> (float) — Prix unitaire</li>
+                    <li><code>quantity</code> (int) — Quantité</li>
+                </ul>
+                <p class="text-muted">
+                    Type NORMAL : prix unitaire ≤ 30 $<br/>
+                    Type PREMIUM : pas de limite
+                </p>
+
+                <div class="row mt-3 g-4">
+                    <div class="col-md-6">
+                        <div class="border rounded p-3 shadow-sm bg-white">
+                            <h6 class="text-success mb-2"><i class="fas fa-check-circle me-1"></i>Succès (200)</h6>
+                            <pre class="code-block"><code>{
+  "token": "nouveauJeton...",
+  "message": "Achat complété."
+}</code></pre>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="border rounded p-3 shadow-sm bg-white">
+                            <h6 class="text-danger mb-2"><i class="fas fa-times-circle me-1"></i>Erreur (400)</h6>
+                            <pre class="code-block"><code>{
+  "message": "Fonds insuffisants."
+}</code></pre>
+                        </div>
+                    </div>
+                </div>
+            </article>
+
+            <article>
+                <h3 class="h6 border-bottom pb-1 text-secondary">
+                    GET /profile/{$token}/transactions
+                    <span class="badge bg-primary ms-2">GET</span>
+                </h3>
+                <p>Récupère l’historique complet des transactions du compte.</p>
+
+                <div class="row mt-3 g-4">
+                    <div class="col-md-6">
+                        <div class="border rounded p-3 shadow-sm bg-white">
+                            <h6 class="text-success mb-2"><i class="fas fa-check-circle me-1"></i>Succès (200)</h6>
+                            <pre class="code-block"><code>{
+  "token": "nouveauJeton...",
+  "transactions": [
+    { "name": "Test", "price": 2.50, "quantity": 3 },
+    ...
+  ]
+}</code></pre>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="border rounded p-3 shadow-sm bg-white">
+                            <h6 class="text-danger mb-2"><i class="fas fa-times-circle me-1"></i>Erreur (400)</h6>
+                            <pre class="code-block"><code>{
+  "message": "Jeton invalide."
+}</code></pre>
+                        </div>
+                    </div>
+                </div>
+            </article>
+        </section>
+
+        <section class="mb-5" id="profile-elevate">
+            <h2 class="h4 text-dark border-bottom pb-2 mb-3">
+                <i class="fas fa-level-up-alt me-2 text-info"></i>/profile/{$token}/elevate
+                <span class="badge bg-primary ms-2">POST</span>
+            </h2>
+            <p>Élève le compte à PREMIUM si l’historique total ≥ 1000 $.</p>
+
+            <div class="row mt-3 g-4">
+                <div class="col-md-6">
+                    <div class="border rounded p-3 shadow-sm bg-white">
+                        <h6 class="text-success mb-2"><i class="fas fa-check-circle me-1"></i>Succès (200)</h6>
+                        <pre class="code-block"><code>{
+  "token": "nouveauJeton...",
+  "message": "Le compte est maintenant PREMIUM."
+}</code></pre>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="border rounded p-3 shadow-sm bg-white">
+                        <h6 class="text-danger mb-2"><i class="fas fa-times-circle me-1"></i>Erreur (400)</h6>
+                        <pre class="code-block"><code>{
+  "message": "Historique insuffisant pour l'élévation."
+}</code></pre>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+</div>
+
+<style>
+    /* Code-block stylé */
+    .code-block {
+        background: #f8f9fa;
+        border: 1px solid #ddd;
+        padding: 0.75rem;
+        border-radius: 5px;
+        font-family: "Fira Code", monospace;
+        font-size: 0.875rem;
+        color: #333;
+        line-height: 1.5;
+        white-space: pre;
+        overflow-x: auto;
+    }
+</style>
+
+{/block}
