@@ -36,4 +36,10 @@ class TokenService
 
         $this->tokenBroker->delete($token);
     }
+
+    public function getUserIDFromToken(string $value): string
+    {
+        $token = $this->tokenBroker->findByValue($value);
+        return $token->user_id ?? '';
+    }
 }

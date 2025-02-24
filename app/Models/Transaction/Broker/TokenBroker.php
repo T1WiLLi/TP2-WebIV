@@ -9,7 +9,7 @@ class TokenBroker extends BaseBroker
 
     public function findByValue(string $value): ?Token
     {
-        $row = $this->selectSingle("SELECT * FROM token WHERE value = ?", [$value]);
+        $row = $this->selectSingle("SELECT * FROM ? WHERE value = ?", [$this->getTableName(), $value]);
         return $row ? $this->mapToEntity($row) : null;
     }
 }
