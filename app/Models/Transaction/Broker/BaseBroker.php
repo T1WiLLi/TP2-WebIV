@@ -5,7 +5,7 @@ use Zephyrus\Database\DatabaseBroker;
 /**
  * @template T of object
  */
-abstract class BaseRepository extends DatabaseBroker
+abstract class BaseBroker extends DatabaseBroker
 {
     protected string $tableName;
     protected string $entityClass;
