@@ -6,4 +6,10 @@ class TokenBroker extends BaseBroker
     {
         parent::__construct("token", Token::class);
     }
+
+    public function findByValue(string $value): ?Token
+    {
+        $row = $this->selectSingle("SELECT * FROM token WHERE value = ?", [$value]);
+        return $row ? $this->mapToEntity($row) : null;
+    }
 }
