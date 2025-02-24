@@ -45,7 +45,7 @@ class UserService
         string $lastname,
         string $email,
         string $username
-    ): bool {
+    ): void {
         $form = new Form([
             "firstname" => $firstname,
             "lastname"  => $lastname,
@@ -58,13 +58,11 @@ class UserService
         $user = $this->userBroker->findById($userId);
         if (!$user) {
             throw new RuntimeException("Utilisateur introuvable.");
-            return false;
         }
 
         $existing = $this->userBroker->findByUsername($username);
         if ($existing && $existing->id !== $user->id) {
             throw new RuntimeException("Le nom d’utilisateur est déjà pris.");
-            return false;
         }
 
         $user->firstname = $firstname;
@@ -73,10 +71,9 @@ class UserService
         $user->username = $username;
 
         $this->userBroker->update($user);
-        return true;
     }
 
-    public function changePassword(int $userId, string $oldPassword, string $newPassword): bool
+    public function changePassword(int $userId, string $oldPassword, string $newPassword): void
     {
         $form = new Form([
             "oldPassword" => $oldPassword,
@@ -88,20 +85,17 @@ class UserService
         $user = $this->userBroker->findById($userId);
         if (!$user) {
             throw new UserNotFound("Utilisateur introuvable.");
-            return false;
         }
 
         if ($user->password !== $oldPassword) {
             throw new RuntimeException("L'ancien mot de passe est invalide.");
-            return false;
         }
 
         $user->password = $newPassword;
         $this->userBroker->update($user);
-        return true;
     }
 
-    public function addCredits(int $userId, float $amount): bool
+    public function addCredits(int $userId, float $amount): void
     {
         $form = new Form([
             "credit" => $amount
@@ -112,21 +106,17 @@ class UserService
         $user = $this->userBroker->findById($userId);
         if (!$user) {
             throw new UserNotFound("Utilisateur introuvable.");
-            return false;
         }
 
         if ($user->type->value === UserMember::NORMAL->value && $amount > 500) {
             throw new RuntimeException("Montant trop élevé (max 500$ pour un compte NORMAL).");
-            return false;
         }
 
         if ($user->type->value === UserMember::PREMIUM->value && $amount > 2000) {
             throw new RuntimeException("Montant trop élevé (max 2000$ pour un compte PREMIUM).");
-            return false;
         }
 
         $user->balance += $amount;
         $this->userBroker->update($user);
-        return true;
     }
 }
