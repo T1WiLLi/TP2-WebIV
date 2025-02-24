@@ -1,2 +1,3 @@
 \ir ./structure.sql;
-\ir ./views.sql;
+
+\ir ./views.sql
