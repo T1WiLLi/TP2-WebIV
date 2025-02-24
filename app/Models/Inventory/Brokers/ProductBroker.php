@@ -1,4 +1,6 @@
-<?php namespace Models\Inventory\Brokers;
+<?php
+
+namespace Models\Inventory\Brokers;
 
 use Models\Inventory\Entities\Product;
 use stdClass;
