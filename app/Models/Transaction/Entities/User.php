@@ -1,6 +1,10 @@
 <?php
 
+namespace Models\Transaction\Entities;
+
 use Models\Core\Entity;
+use Models\Transaction\helper\JsonEntity;
+use stdClass;
 
 class User extends Entity implements JsonEntity
 {
@@ -11,7 +15,7 @@ class User extends Entity implements JsonEntity
     public string $lastname;
     public string $email;
     public float $balance;
-    public UserMember $type;
+    public string $type;
 
     public function toJson(bool $isDebugging = false): string
     {
@@ -22,7 +26,7 @@ class User extends Entity implements JsonEntity
         $dto->lastname = $this->lastname;
         $dto->email = $this->email;
         $dto->balance = $this->balance;
-        $dto->type = $this->type->value;
+        $dto->type = $this->type;
 
         if ($isDebugging) {
             $dto->password = $this->password;

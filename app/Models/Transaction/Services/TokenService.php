@@ -1,5 +1,9 @@
 <?php
 
+namespace Models\Transaction\Services;
+
+use Models\Transaction\Broker\TokenBroker;
+use Models\Transaction\Entities\Token;
 use Zephyrus\Security\Cryptography;
 
 class TokenService
@@ -18,7 +22,7 @@ class TokenService
         $token = new Token();
         $token->value = $value;
         $token->user_id = $userID;
-        $token->created_at = new \DateTime();
+        $token->created_at = (new \DateTime())->format("Y-m-d H:i:s");
 
         $id = $this->tokenBroker->insert($token);
         $token->id = $id;
@@ -37,7 +41,7 @@ class TokenService
         $this->tokenBroker->delete($token);
     }
 
-    public function getUserIDFromToken(string $value): string
+    public function getUserIDFromToken(string $value): int
     {
         $token = $this->tokenBroker->findByValue($value);
         return $token->user_id ?? '';

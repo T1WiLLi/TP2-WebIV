@@ -1,6 +1,13 @@
 <?php
 
-use Models\User\Validators\UserValidator;
+namespace Models\Transaction\Services;
+
+use Models\Exceptions\UserNotFound;
+use Models\Transaction\Broker\UserBroker;
+use Models\Transaction\Entities\User;
+use Models\Transaction\helper\UserMember;
+use Models\Transaction\Validators\UserValidator;
+use RuntimeException;
 use Zephyrus\Application\Form;
 
 class UserService
@@ -118,5 +125,10 @@ class UserService
 
         $user->balance += $amount;
         $this->userBroker->update($user);
+    }
+
+    public function getIdByUsername(string $username): int
+    {
+        return $this->userBroker->findByUsername($username)->id;
     }
 }

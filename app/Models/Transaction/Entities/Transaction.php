@@ -1,6 +1,10 @@
 <?php
 
+namespace Models\Transaction\Entities;
+
 use Models\Core\Entity;
+use Models\Transaction\helper\JsonEntity;
+use stdClass;
 
 class Transaction extends Entity implements JsonEntity
 {

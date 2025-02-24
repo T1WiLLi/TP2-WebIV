@@ -1,5 +1,10 @@
 <?php
 
+
+namespace Models\Transaction\Broker;
+
+use Models\Transaction\Entities\User;
+
 class UserBroker extends BaseBroker
 {
     public function __construct()
@@ -9,7 +14,7 @@ class UserBroker extends BaseBroker
 
     public function findByUsername(string $username): ?User
     {
-        $row = $this->selectSingle("SELECT * FROM ? WHERE username = ?", [$this->getTableName(), $username]);
+        $row = $this->selectSingle("SELECT * FROM {$this->getTableName()} WHERE username = ?", [$username]);
         return $row ? $this->mapToEntity($row) : null;
     }
 }

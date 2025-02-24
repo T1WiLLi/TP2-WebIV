@@ -1,5 +1,8 @@
 <?php
 
+namespace Models\Transaction\Broker;
+
+use stdClass;
 use Zephyrus\Database\DatabaseBroker;
 
 /**
@@ -120,11 +123,39 @@ abstract class BaseBroker extends DatabaseBroker
     protected function mapToEntity(stdClass $row): object
     {
         $entity = new $this->entityClass();
+        $reflectionClass = new \ReflectionClass($this->entityClass);
+
         foreach (get_object_vars($row) as $property => $value) {
+            if (!$reflectionClass->hasProperty($property)) {
+                continue;
+            }
+
+            $reflectionProperty = $reflectionClass->getProperty($property);
+            $type = $reflectionProperty->getType();
+
+            if (is_null($type)) {
+                $entity->$property = $value;
+                continue;
+            }
+
+            $typeName = $type->getName();
+
+            if ($typeName === \DateTime::class) {
+                $entity->$property = new \DateTime($value);
+                continue;
+            }
+
+            if (enum_exists($typeName)) {
+                $entity->$property = $typeName::from($value);
+                continue;
+            }
+
             $entity->$property = $value;
         }
+
         return $entity;
     }
+
 
     /**
      * Gets the table name.

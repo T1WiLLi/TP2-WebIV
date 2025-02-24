@@ -1,5 +1,12 @@
 <?php
 
+namespace Models\Transaction\Services;
+
+use Models\Transaction\Broker\TransactionBroker;
+use Models\Transaction\Broker\UserBroker;
+use Models\Transaction\Entities\Transaction;
+use Models\Transaction\Validators\TransactionValidator;
+use RuntimeException;
 use Zephyrus\Application\Form;
 
 class TransactionService

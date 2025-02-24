@@ -1,5 +1,7 @@
 <?php
 
+namespace Models\Transaction\Validators;
+
 use Models\Exceptions\FormException;
 use Zephyrus\Application\Form;
 use Zephyrus\Application\Rule;
