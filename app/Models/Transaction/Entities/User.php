@@ -3,10 +3,8 @@
 namespace Models\Transaction\Entities;
 
 use Models\Core\Entity;
-use Models\Transaction\helper\JsonEntity;
-use stdClass;
 
-class User extends Entity implements JsonEntity
+class User extends Entity
 {
     public int $id;
     public string $username;
@@ -16,22 +14,4 @@ class User extends Entity implements JsonEntity
     public string $email;
     public float $balance;
     public string $type;
-
-    public function toJson(bool $isDebugging = false): string
-    {
-        $dto = new stdClass();
-        $dto->id = $this->id;
-        $dto->username = $this->username;
-        $dto->firstname = $this->firstname;
-        $dto->lastname = $this->lastname;
-        $dto->email = $this->email;
-        $dto->balance = $this->balance;
-        $dto->type = $this->type;
-
-        if ($isDebugging) {
-            $dto->password = $this->password;
-        }
-
-        return json_encode($dto, JSON_THROW_ON_ERROR);
-    }
 }

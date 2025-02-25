@@ -158,4 +158,15 @@ class UserService
     {
         return $this->userBroker->findByUsername($username)->id;
     }
+
+    public function elevateAccount(int $userId): void
+    {
+        $user = $this->userBroker->findById($userId);
+        if (!$user) {
+            throw new UserNotFound("Utilisateur introuvable.");
+        }
+
+        $user->type = "PREMIUM";
+        $this->userBroker->update($user);
+    }
 }

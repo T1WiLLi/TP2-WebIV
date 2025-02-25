@@ -4,6 +4,7 @@ namespace Models\Transaction\Services;
 
 use Models\Transaction\Broker\TokenBroker;
 use Models\Transaction\Entities\Token;
+use RuntimeException;
 use Zephyrus\Security\Cryptography;
 
 class TokenService
@@ -15,7 +16,31 @@ class TokenService
         $this->tokenBroker = new TokenBroker();
     }
 
-    public function createToken(int $userID): Token
+    public function refresh(string $token, int $userId): Token
+    {
+        $this->deleteToken($token);
+        return $this->createToken($userId);
+    }
+
+    public function validateToken(string $value): bool
+    {
+        $token = $this->tokenBroker->findByValue($value);
+        if (null === $token) {
+            return false;
+        }
+        return true;
+    }
+
+    public function getUserIDFromToken(string $value): int
+    {
+        $token = $this->tokenBroker->findByValue($value);
+        if (null === $token) {
+            throw new RuntimeException("Token invalide.");
+        }
+        return $token->user_id;
+    }
+
+    private function createToken(int $userID): Token
     {
         $value = Cryptography::randomString(24);
 
@@ -30,20 +55,8 @@ class TokenService
         return $token;
     }
 
-    public function validateToken(string $value): bool
+    private function deleteToken(string $token): void
     {
-        $token = $this->tokenBroker->findByValue($value);
-
-        if (null === $token) {
-            return false;
-        }
-
-        $this->tokenBroker->delete($token);
-    }
-
-    public function getUserIDFromToken(string $value): int
-    {
-        $token = $this->tokenBroker->findByValue($value);
-        return $token->user_id ?? '';
+        $this->tokenBroker->delete($this->tokenBroker->findByValue($token));
     }
 }
