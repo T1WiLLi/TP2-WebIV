@@ -42,28 +42,19 @@ class UserController extends Controller
         $token = $this->request->getArgument('token');
         if ($token !== null) {
             $this->currentToken = $token;
-            // Validate token; if invalid, abort
             if (!$this->tokenService->validateToken($token)) {
                 return $this->abortForbidden("Le token est invalide.");
             }
-
-            // Retrive user from the token
-            $userID = $this->tokenService->getUserIDFromToken($token);
-            $this->currentUser = $this->userService->getProfile($userID);
-            if (!$this->currentUser) {
-                return $this->abortNotFound("L'utilisateur n'a pas été trouvé.");
-            }
+            $this->currentUser = $this->retrieveUserBefore($token);
         }
-
         return null;
     }
 
     #[Get("/profile/{token}")]
     public function getProfile(string $token): Response
     {
-        $refreshedToken = $this->tokenService->refresh($this->currentToken, $this->currentUser->id);
         return $this->json([
-            "token"     => $refreshedToken->value,
+            "token"     => $this->refreshToken(),
             "username"  => $this->currentUser->username,
             "firstname" => $this->currentUser->firstname,
             "lastname"  => $this->currentUser->lastname,
@@ -77,7 +68,6 @@ class UserController extends Controller
     public function updateProfile(string $token): Response
     {
         $data = $this->request->getBody()->getParameters();
-
         $this->userService->updateProfile(
             $this->currentUser->id,
             $data['firstname'] ?? $this->currentUser->firstname,
@@ -85,10 +75,8 @@ class UserController extends Controller
             $data['email'] ?? $this->currentUser->email,
             $data['username'] ?? $this->currentUser->username
         );
-
-        $refreshedToken = $this->tokenService->refresh($this->currentToken, $this->currentUser->id);
         return $this->json([
-            "token"   => $refreshedToken->value,
+            "token"   => $this->refreshToken(),
             "message" => "Le profil a été mis à jour avec succès."
         ], 200);
     }
@@ -98,22 +86,17 @@ class UserController extends Controller
     public function changePassword(string $token): Response
     {
         $data = $this->request->getBody()->getParameters();
-
         try {
             $this->userService->changePassword(
                 $this->currentUser->id,
                 $data['old_password'] ?? '',
                 $data['new_password'] ?? ''
             );
-        } catch (UserNotFound $e) {
-            return $this->abortNotFound("L'utilisateur n'a pas été trouvé.");
-        } catch (RuntimeException $e) {
+        } catch (\Exception $e) {
             return $this->abortBadRequest($e->getMessage());
         }
-
-        $refreshedToken = $this->tokenService->refresh($this->currentToken, $this->currentUser->id);
         return $this->json([
-            "token"   => $refreshedToken->value,
+            "token"   => $this->refreshToken(),
             "message" => "Mot de passe modifié avec succès."
         ], 200);
     }
@@ -122,21 +105,13 @@ class UserController extends Controller
     public function addCredits(string $token): Response
     {
         $data = $this->request->getBody()->getParameters();
-
         try {
-            $this->userService->addCredits(
-                $this->currentUser->id,
-                (float)($data['credit'] ?? 0)
-            );
-        } catch (UserNotFound $e) {
-            return $this->abortNotFound("L'utilisateur n'a pas été trouvé.");
-        } catch (RuntimeException $e) {
+            $this->userService->addCredits($this->currentUser->id, (float)($data['credit'] ?? 0));
+        } catch (\Exception $e) {
             return $this->abortBadRequest($e->getMessage());
         }
-
-        $refreshedToken = $this->tokenService->refresh($this->currentToken, $this->currentUser->id);
         return $this->json([
-            "token"   => $refreshedToken->value,
+            "token"   => $this->refreshToken(),
             "message" => "Crédits ajoutés avec succès."
         ], 200);
     }
@@ -152,7 +127,6 @@ class UserController extends Controller
     public function performTransaction(string $token): Response
     {
         $data = $this->request->getBody()->getParameters();
-
         try {
             $this->transactionService->createTransaction(
                 $this->currentUser->id,
@@ -160,13 +134,11 @@ class UserController extends Controller
                 (float)($data['price'] ?? 0),
                 (int)($data['quantity'] ?? 0)
             );
-        } catch (RuntimeException $e) {
+        } catch (\Exception $e) {
             return $this->abortBadRequest($e->getMessage());
         }
-
-        $refreshedToken = $this->tokenService->refresh($this->currentToken, $this->currentUser->id);
         return $this->json([
-            "token"   => $refreshedToken->value,
+            "token"   => $this->refreshToken(),
             "message" => "Transaction créée avec succès."
         ], 201);
     }
@@ -176,14 +148,28 @@ class UserController extends Controller
     {
         try {
             $this->userService->elevateAccount($this->currentUser->id);
-        } catch (UserNotFound $e) {
-            return $this->abortNotFound("L'utilisateur n'a pas été trouvé.");
+        } catch (\Exception $e) {
+            return $this->abortBadRequest($e->getMessage());
         }
-
-        $refreshedToken = $this->tokenService->refresh($this->currentToken, $this->currentUser->id);
         return $this->json([
-            "token"   => $refreshedToken->value,
+            "token"   => $this->refreshToken(),
             "message" => "Le compte est maintenant PREMIUM."
         ], 200);
+    }
+
+    private function refreshToken(): string
+    {
+        $this->currentToken = $this->tokenService->refresh($this->currentToken, $this->currentUser->id)->value;
+        return $this->currentToken;
+    }
+
+    private function retrieveUserBefore(string $token): User
+    {
+        $userID = $this->tokenService->getUserIDFromToken($token);
+        $user = $this->userService->getProfile($userID);
+        if (!$this->currentUser) {
+            return $this->abortNotFound("L'utilisateur n'a pas été trouvé.");
+        }
+        return $user;
     }
 }
