@@ -64,15 +64,20 @@ abstract class BaseBroker extends DatabaseBroker
             if ($key !== 'id') {
                 $columns[] = $key;
                 $values[] = "?";
-                $params[] = $value;
+                if ($value instanceof \DateTime) {
+                    $params[] = $value->format("Y-m-d H:i:s");
+                } else {
+                    $params[] = $value;
+                }
             }
         }
 
         $query = "INSERT INTO {$this->tableName} (" . implode(", ", $columns) . ") 
-                  VALUES (" . implode(", ", $values) . ") RETURNING id";
+              VALUES (" . implode(", ", $values) . ") RETURNING id";
 
         return $this->selectSingle($query, $params)->id;
     }
+
 
     /**
      * Updates an existing entity in the database.
@@ -88,15 +93,19 @@ abstract class BaseBroker extends DatabaseBroker
         foreach (get_object_vars($entity) as $key => $value) {
             if ($key !== 'id') {
                 $sets[] = "$key = ?";
-                $params[] = $value;
+                if ($value instanceof \DateTime) {
+                    $params[] = $value->format("Y-m-d H:i:s");
+                } else {
+                    $params[] = $value;
+                }
             }
         }
 
         $params[] = $entity->id;
 
         $query = "UPDATE {$this->tableName} 
-                  SET " . implode(", ", $sets) . " 
-                  WHERE id = ?";
+              SET " . implode(", ", $sets) . " 
+              WHERE id = ?";
 
         $this->query($query, $params);
         return $this->getLastAffectedCount();

@@ -16,9 +16,11 @@ class TokenService
         $this->tokenBroker = new TokenBroker();
     }
 
-    public function refresh(string $token, int $userId): Token
+    public function refresh(?string $token, int $userId): Token
     {
-        $this->deleteToken($token);
+        if (!empty($token)) {
+            $this->deleteToken($token);
+        }
         return $this->createToken($userId);
     }
 
@@ -57,6 +59,9 @@ class TokenService
 
     private function deleteToken(string $token): void
     {
-        $this->tokenBroker->delete($this->tokenBroker->findByValue($token));
+        $foundToken = $this->tokenBroker->findByValue($token);
+        if ($foundToken !== null) {
+            $this->tokenBroker->delete($foundToken);
+        }
     }
 }

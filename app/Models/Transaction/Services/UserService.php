@@ -20,7 +20,7 @@ class UserService
         $this->userBroker = new UserBroker();
     }
 
-    public function login(string $username, string $password): bool
+    public function login(string $username, string $password): bool // CHECK FOR OTHER TOKEN EXISTENCE AT THIS POINT AND REMOVE THEM.
     {
         $form = new Form([
             "username" => $username,
@@ -121,11 +121,11 @@ class UserService
             throw new UserNotFound("Utilisateur introuvable.");
         }
 
-        if ($user->password !== $oldPassword) {
+        if (!Cryptography::verifyHashedPassword($oldPassword, $user->password)) {
             throw new RuntimeException("L'ancien mot de passe est invalide.");
         }
 
-        $user->password = $newPassword;
+        $user->password = Cryptography::hashPassword($newPassword);
         $this->userBroker->update($user);
     }
 

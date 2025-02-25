@@ -33,7 +33,7 @@ class TransactionService
             "quantity" => $quantity
         ]);
 
-        TransactionValidator::validateCreate($form, $user->type->value);
+        TransactionValidator::validateCreate($form, $user->type);
 
         $totalCost = $price * $quantity;
         if ($totalCost > $user->balance) {

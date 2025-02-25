@@ -1,6 +1,6 @@
 {
     "username": "johnDoe",
-    "password": "StrongP@ss123"
+    "password": "NewPassword456!"
 }
 
 {
@@ -10,3 +10,6 @@
     "lastname": "Doe",
     "email": "john@example.com"
 }
+
+
+Si ont login, ont regarde si y'aurait pas des tokens qui traine dans la BD et ont les supprime.

@@ -31,12 +31,8 @@ class UserValidator
             Rule::regex('/^[a-zA-Z0-9_-]{3,20}$/', "Le nom d'utilisateur doit être alphanumérique et comporter de 3 à 20 caractères.")
         ]);
 
-        $form->field("password", [
+        $form->field("password", [ // Add a regex later
             Rule::required("Le mot de passe est requis."),
-            Rule::regex(
-                '/^(?=.*[A-Za-z])(?=.*\d)(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]{8,}$/',
-                "Le mot de passe doit comporter au moins 8 caractères, une lettre, un chiffre et un caractère spécial."
-            )
         ]);
 
         $form->field("firstname", [
@@ -85,12 +81,8 @@ class UserValidator
             Rule::required("L'ancien mot de passe est requis.")
         ]);
 
-        $form->field("newPassword", [
+        $form->field("newPassword", [ // Add a regex later
             Rule::required("Le nouveau mot de passe est requis."),
-            Rule::regex(
-                "/^(?=.*[A-Z])(?=.*[a-z])(?=.*\d).{8,}$/",
-                "Le mot de passe doit contenir au moins 8 caractères, une majuscule, une minuscule et un chiffre."
-            )
         ]);
 
         if (!$form->verify()) {

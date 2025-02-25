@@ -12,34 +12,36 @@ use Zephyrus\Network\Router\Post;
 
 class AuthentificationController extends Controller
 {
+    private UserService $userService;
+    private TokenService $tokenService;
+
+    public function __construct()
+    {
+        $this->userService = new UserService();
+        $this->tokenService = new TokenService();
+    }
 
     #[Post("/login")]
     public function login(): Response
     {
         $data = $this->request->getBody()->getParameters();
-        $username = $data["username"] ?? null;
-        $password = $data["password"] ?? null;
+        $username = $data['username'] ?? null;
+        $password = $data['password'] ?? null;
 
         try {
-            $userService = new UserService();
-            $isAuthenticated = $userService->login($username, $password);
-
-            if (!$isAuthenticated) {
+            if (!$this->userService->login($username, $password)) {
                 return $this->abortNotFound("Identifiants d'authentification invalides.");
             }
-
-            $id = $userService->getIdByUsername($username);
-            $tokenService = new TokenService();
-            $token = $tokenService->refresh("", $id);
-
+            $userId = $this->userService->getIdByUsername($username);
+            $token = $this->tokenService->refresh("", $userId);
             return $this->json([
-                "token" => $token->value,
+                "token"   => $token->value,
                 "message" => "Authentification réussie."
             ], 200);
         } catch (FormException $e) {
             return $this->json([
                 "message" => "Erreur de validation.",
-                "errors" => $e->getForm()
+                "errors"  => $e->getForm()
             ], 400);
         } catch (RuntimeException $e) {
             return $this->json([
@@ -54,11 +56,9 @@ class AuthentificationController extends Controller
         $formData = $this->request->getBody()->getParameters();
 
         try {
-            $userService = new UserService();
-            $userService->register($formData);
-
+            $this->userService->register($formData);
             return $this->json([
-                'message' => "User registered successfully."
+                "message" => "User registered successfully."
             ], 201);
         } catch (RuntimeException $e) {
             return $this->json([
@@ -66,7 +66,7 @@ class AuthentificationController extends Controller
             ], 400);
         } catch (FormException $e) {
             return $this->json([
-                'message' => $e->getMessage()
+                "message" => $e->getMessage()
             ], 400);
         }
     }
