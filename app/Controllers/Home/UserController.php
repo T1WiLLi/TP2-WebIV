@@ -2,12 +2,10 @@
 
 namespace Controllers\Home;
 
-use Models\Exceptions\UserNotFound;
 use Models\Transaction\Entities\User;
 use Models\Transaction\Services\TokenService;
 use Models\Transaction\Services\TransactionService;
 use Models\Transaction\Services\UserService;
-use RuntimeException;
 use Zephyrus\Application\Controller;
 use Zephyrus\Network\Response;
 use Zephyrus\Network\Router\Get;
@@ -53,15 +51,14 @@ class UserController extends Controller
     #[Get("/profile/{token}")]
     public function getProfile(string $token): Response
     {
-        return $this->json([
-            "token"     => $this->refreshToken(),
+        return $this->respondWithToken([
             "username"  => $this->currentUser->username,
             "firstname" => $this->currentUser->firstname,
             "lastname"  => $this->currentUser->lastname,
             "email"     => $this->currentUser->email,
             "balance"   => $this->currentUser->balance,
             "type"      => $this->currentUser->type,
-        ], 200);
+        ]);
     }
 
     #[Put("/profile/{token}")]
@@ -75,10 +72,9 @@ class UserController extends Controller
             $data['email'] ?? $this->currentUser->email,
             $data['username'] ?? $this->currentUser->username
         );
-        return $this->json([
-            "token"   => $this->refreshToken(),
+        return $this->respondWithToken([
             "message" => "Le profil a été mis à jour avec succès."
-        ], 200);
+        ]);
     }
 
 
@@ -95,10 +91,9 @@ class UserController extends Controller
         } catch (\Exception $e) {
             return $this->abortBadRequest($e->getMessage());
         }
-        return $this->json([
-            "token"   => $this->refreshToken(),
+        return $this->respondWithToken([
             "message" => "Mot de passe modifié avec succès."
-        ], 200);
+        ]);
     }
 
     #[Post("/profile/{token}/credits")]
@@ -110,10 +105,9 @@ class UserController extends Controller
         } catch (\Exception $e) {
             return $this->abortBadRequest($e->getMessage());
         }
-        return $this->json([
-            "token"   => $this->refreshToken(),
+        return $this->respondWithToken([
             "message" => "Crédits ajoutés avec succès."
-        ], 200);
+        ]);
     }
 
     #[Get("/profile/{token}/transactions")]
@@ -137,8 +131,7 @@ class UserController extends Controller
         } catch (\Exception $e) {
             return $this->abortBadRequest($e->getMessage());
         }
-        return $this->json([
-            "token"   => $this->refreshToken(),
+        return $this->respondWithToken([
             "message" => "Transaction créée avec succès."
         ], 201);
     }
@@ -151,10 +144,15 @@ class UserController extends Controller
         } catch (\Exception $e) {
             return $this->abortBadRequest($e->getMessage());
         }
-        return $this->json([
-            "token"   => $this->refreshToken(),
+        return $this->respondWithToken([
             "message" => "Le compte est maintenant PREMIUM."
-        ], 200);
+        ]);
+    }
+
+    private function respondWithToken(array $data, int $status = 200): Response
+    {
+        $data['token'] = $this->refreshToken();
+        return $this->json($data, $status);
     }
 
     private function refreshToken(): string
