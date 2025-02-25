@@ -30,7 +30,7 @@ class AuthentificationController extends Controller
 
             $id = $userService->getIdByUsername($username);
             $tokenService = new TokenService();
-            $token = $tokenService->createToken($id);
+            $token = $tokenService->refresh("", $id);
 
             return $this->json([
                 "token" => $token->value,
