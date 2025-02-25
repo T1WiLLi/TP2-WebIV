@@ -17,4 +17,10 @@ class UserBroker extends BaseBroker
         $row = $this->selectSingle("SELECT * FROM {$this->getTableName()} WHERE username = ?", [$username]);
         return $row ? $this->mapToEntity($row) : null;
     }
+
+    public function findByEmail(string $email): ?User
+    {
+        $row = $this->selectSingle("SELECT * FROM {$this->getTableName()} WHERE email = ?", [$email]);
+        return $row ? $this->mapToEntity($row) : null;
+    }
 }

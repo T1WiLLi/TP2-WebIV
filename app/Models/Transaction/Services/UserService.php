@@ -9,6 +9,7 @@ use Models\Transaction\helper\UserMember;
 use Models\Transaction\Validators\UserValidator;
 use RuntimeException;
 use Zephyrus\Application\Form;
+use Zephyrus\Security\Cryptography;
 
 class UserService
 {
@@ -33,11 +34,37 @@ class UserService
             return false;
         }
 
-        if ($user->password !== $password) { // for now plain, later hashed
+        if (!Cryptography::verifyHashedPassword($password, $user->password)) {
             return false;
         }
 
         return true;
+    }
+
+    public function register(array $formData)
+    {
+        // UserValidator::validateRegistration($formData);
+
+        if (
+            $this->userBroker->findByUsername($formData['username']) ||
+            $this->userBroker->findByEmail($formData['email'])
+        ) {
+            throw new RuntimeException("Username or Email already taken.");
+            return;
+        }
+
+        $hashedPassword = Cryptography::hashPassword($formData['password']);
+
+        $user = new User();
+        $user->username = $formData['username'];
+        $user->password = $hashedPassword;
+        $user->firstname = $formData['firstname'];
+        $user->lastname = $formData['lastname'];
+        $user->email = $formData['email'];
+        $user->balance = 0.0;
+        $user->type = 'NORMAL';
+
+        $this->userBroker->insert($user);
     }
 
 
@@ -115,11 +142,11 @@ class UserService
             throw new UserNotFound("Utilisateur introuvable.");
         }
 
-        if ($user->type->value === UserMember::NORMAL->value && $amount > 500) {
+        if ($user->type === "NORMAL" && $amount > 500) {
             throw new RuntimeException("Montant trop élevé (max 500$ pour un compte NORMAL).");
         }
 
-        if ($user->type->value === UserMember::PREMIUM->value && $amount > 2000) {
+        if ($user->type === "PREMIUM" && $amount > 2000) {
             throw new RuntimeException("Montant trop élevé (max 2000$ pour un compte PREMIUM).");
         }
 

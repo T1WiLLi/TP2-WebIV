@@ -47,4 +47,27 @@ class AuthentificationController extends Controller
             ], 400);
         }
     }
+
+    #[Post("/register")]
+    public function register(): Response
+    {
+        $formData = $this->request->getBody()->getParameters();
+
+        try {
+            $userService = new UserService();
+            $userService->register($formData);
+
+            return $this->json([
+                'message' => "User registered successfully."
+            ], 201);
+        } catch (RuntimeException $e) {
+            return $this->json([
+                "message" => $e->getMessage()
+            ], 400);
+        } catch (FormException $e) {
+            return $this->json([
+                'message' => $e->getMessage()
+            ], 400);
+        }
+    }
 }
