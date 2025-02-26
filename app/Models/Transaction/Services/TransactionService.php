@@ -41,7 +41,7 @@ class TransactionService
         }
 
         $user->balance -= $totalCost;
-        $this->userBroker->update($user);
+        $this->userBroker->save($user);
 
         $transaction = new Transaction();
         $transaction->user_id = $user->id;
@@ -51,11 +51,11 @@ class TransactionService
         $transaction->total = $totalCost;
         $transaction->created_at = new \DateTime();
 
-        $this->transactionBroker->insert($transaction);
+        $this->transactionBroker->save($transaction);
     }
 
     public function getTransactions(int $userId): array
     {
-        return $this->transactionBroker->findByUserId($userId);
+        return Transaction::buildArray($this->transactionBroker->findByUserId($userId));
     }
 }

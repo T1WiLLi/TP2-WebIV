@@ -64,13 +64,13 @@ class UserService
         $user->balance = 0.0;
         $user->type = 'NORMAL';
 
-        $this->userBroker->insert($user);
+        $this->userBroker->save($user);
     }
 
 
     public function getProfile(int $userId): ?User
     {
-        return $this->userBroker->findById($userId);
+        return User::build($this->userBroker->findById($userId));
     }
 
     public function updateProfile(
@@ -104,7 +104,7 @@ class UserService
         $user->email = $email;
         $user->username = $username;
 
-        $this->userBroker->update($user);
+        $this->userBroker->save($user);
     }
 
     public function changePassword(int $userId, string $oldPassword, string $newPassword): void
@@ -126,7 +126,7 @@ class UserService
         }
 
         $user->password = Cryptography::hashPassword($newPassword);
-        $this->userBroker->update($user);
+        $this->userBroker->save($user);
     }
 
     public function addCredits(int $userId, float $amount): void
@@ -151,7 +151,7 @@ class UserService
         }
 
         $user->balance += $amount;
-        $this->userBroker->update($user);
+        $this->userBroker->save($user);
     }
 
     public function getIdByUsername(string $username): int
@@ -167,6 +167,6 @@ class UserService
         }
 
         $user->type = "PREMIUM";
-        $this->userBroker->update($user);
+        $this->userBroker->save($user);
     }
 }

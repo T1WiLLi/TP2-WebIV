@@ -5,7 +5,7 @@ namespace Models\Transaction\Broker;
 
 use Models\Transaction\Entities\User;
 
-class UserBroker extends BaseBroker
+class UserBroker extends Broker
 {
     public function __construct()
     {
@@ -14,13 +14,13 @@ class UserBroker extends BaseBroker
 
     public function findByUsername(string $username): ?User
     {
-        $row = $this->selectSingle("SELECT * FROM {$this->getTableName()} WHERE username = ?", [$username]);
-        return $row ? $this->mapToEntity($row) : null;
+        $row = $this->selectSingle("SELECT * FROM {$this->table} WHERE username = ?", [$username]);
+        return $row ? $row : null;
     }
 
     public function findByEmail(string $email): ?User
     {
-        $row = $this->selectSingle("SELECT * FROM {$this->getTableName()} WHERE email = ?", [$email]);
-        return $row ? $this->mapToEntity($row) : null;
+        $row = $this->selectSingle("SELECT * FROM {$this->table} WHERE email = ?", [$email]);
+        return $row ? $row : null;
     }
 }

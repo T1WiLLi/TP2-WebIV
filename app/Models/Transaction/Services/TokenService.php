@@ -35,7 +35,7 @@ class TokenService
 
     public function getUserIDFromToken(string $value): int
     {
-        $token = $this->tokenBroker->findByValue($value);
+        $token = Token::build($this->tokenBroker->findByValue($value));
         if (null === $token) {
             throw new RuntimeException("Token invalide.");
         }
@@ -51,7 +51,7 @@ class TokenService
         $token->user_id = $userID;
         $token->created_at = (new \DateTime())->format("Y-m-d H:i:s");
 
-        $id = $this->tokenBroker->insert($token);
+        $id = $this->tokenBroker->save($token);
         $token->id = $id;
 
         return $token;
@@ -59,9 +59,9 @@ class TokenService
 
     private function deleteToken(string $token): void
     {
-        $foundToken = $this->tokenBroker->findByValue($token);
+        $foundToken = Token::build($this->tokenBroker->findByValue($token));
         if ($foundToken !== null) {
-            $this->tokenBroker->delete($foundToken);
+            $this->tokenBroker->delete($foundToken->id);
         }
     }
 }
