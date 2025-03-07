@@ -2,7 +2,6 @@
 
 namespace Controllers\Home;
 
-use Exception;
 use Models\Exceptions\FormException;
 use Models\Transaction\Entities\User;
 use Models\Transaction\Services\TokenService;
@@ -54,7 +53,6 @@ class UserController extends Controller
         return null;
     }
 
-
     #[Get("/profile/{token}")]
     public function getProfile(string $token): Response
     {
@@ -96,7 +94,7 @@ class UserController extends Controller
                 $data['new_password'] ?? ''
             );
         } catch (FormException $e) {
-            return $this->abortBadRequest($e->getMessage() . "Trace: " . json_encode($e->getForm()->getErrorMessages(), JSON_PRETTY_PRINT));
+            return $this->abortBadRequest($e->getMessage() . "Trace: " . \json_encode($e->getForm()->getErrorMessages(), JSON_PRETTY_PRINT));
         }
         return $this->respondWithToken([
             "message" => "Mot de passe modifié avec succès."
