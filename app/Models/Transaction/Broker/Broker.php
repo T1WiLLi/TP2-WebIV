@@ -2,7 +2,7 @@
 
 namespace Models\Transaction\Broker;
 
-
+use Models\Core\Entity;
 use stdClass;
 use Zephyrus\Database\Core\Database;
 use Zephyrus\Database\DatabaseBroker;
@@ -19,7 +19,7 @@ abstract class Broker extends DatabaseBroker
      * @param string $table The name of the table associated with this broker.
      * @param null|Database $database An optional database instance.
      */
-    public function __construct(Database $database = null, string $table)
+    public function __construct(?Database $database = null, string $table)
     {
         parent::__construct($database);
         $this->table = $table;
@@ -67,7 +67,7 @@ abstract class Broker extends DatabaseBroker
      * @param object $entity The entity to save.
      * @return int The row's ID (existing or newly created).
      */
-    public function save(object $entity): int // Should we verify the state of the entity in the database ? ... maybe not (overhead on the DB). The state of the entity can be known from the id being unset or set.
+    public function save(Entity $entity): int // Should we verify the state of the entity in the database ? ... maybe not (overhead on the DB). The state of the entity can be known from the id being unset or set.
     {
         $data = $entity->jsonSerialize();
         if (isset($data['id']) && $data['id']) {
@@ -87,7 +87,7 @@ abstract class Broker extends DatabaseBroker
      * @return int The number of affected rows.
      * @throws \InvalidArgumentException If the entity does not have an id.
      */
-    private function update(object $entity): int
+    private function update(Entity $entity): int
     {
         $data = $entity->jsonSerialize();
         if (!isset($data['id']) || !$data['id']) {
@@ -112,7 +112,7 @@ abstract class Broker extends DatabaseBroker
      * @param object $entity The entity to insert.
      * @return int The newly inserted row's ID.
      */
-    private function insert(object $entity): int
+    private function insert(Entity $entity): int
     {
         $data = $entity->jsonSerialize();
         if (isset($data['id'])) {

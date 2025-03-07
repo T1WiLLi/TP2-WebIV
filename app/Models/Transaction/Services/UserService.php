@@ -89,7 +89,7 @@ class UserService
 
         UserValidator::validateProfile($form);
 
-        $user = $this->userBroker->findById($userId);
+        $user = User::build($this->userBroker->findById($userId));
         if (!$user) {
             throw new RuntimeException("Utilisateur introuvable.");
         }
@@ -116,7 +116,7 @@ class UserService
 
         UserValidator::validatePasswordChange($form);
 
-        $user = $this->userBroker->findById($userId);
+        $user = User::build($this->userBroker->findById($userId));
         if (!$user) {
             throw new UserNotFound("Utilisateur introuvable.");
         }
@@ -137,7 +137,7 @@ class UserService
 
         UserValidator::validateCredit($form);
 
-        $user = $this->userBroker->findById($userId);
+        $user = User::build($this->userBroker->findById($userId));
         if (!$user) {
             throw new UserNotFound("Utilisateur introuvable.");
         }
@@ -161,7 +161,7 @@ class UserService
 
     public function elevateAccount(int $userId): void
     {
-        $user = $this->userBroker->findById($userId);
+        $user = User::build($this->userBroker->findById($userId));
         if (!$user) {
             throw new UserNotFound("Utilisateur introuvable.");
         }
