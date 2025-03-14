@@ -2,13 +2,11 @@
 
 namespace Models\Transaction\Broker;
 
-use Models\Transaction\Entities\Transaction;
-
 class TransactionBroker extends Broker
 {
     public function __construct()
     {
-        parent::__construct("transactions", Transaction::class);
+        parent::__construct("transactions");
     }
 
     public function findByUserId(int $userId): array

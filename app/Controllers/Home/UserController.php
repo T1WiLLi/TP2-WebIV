@@ -54,7 +54,7 @@ class UserController extends Controller
     }
 
     #[Get("/profile/{token}")]
-    public function getProfile(string $token): Response
+    public function getProfile(): Response
     {
         return $this->respondWithToken([
             "username"  => $this->currentUser->username,
@@ -67,7 +67,7 @@ class UserController extends Controller
     }
 
     #[Put("/profile/{token}")]
-    public function updateProfile(string $token): Response
+    public function updateProfile(): Response
     {
         $data = $this->request->getBody()->getParameters();
         $this->userService->updateProfile(
@@ -84,7 +84,7 @@ class UserController extends Controller
 
 
     #[Put("/profile/{token}/password")]
-    public function changePassword(string $token): Response
+    public function changePassword(): Response
     {
         $data = $this->request->getBody()->getParameters();
         try {
@@ -102,7 +102,7 @@ class UserController extends Controller
     }
 
     #[Post("/profile/{token}/credits")]
-    public function addCredits(string $token): Response
+    public function addCredits(): Response
     {
         $data = $this->request->getBody()->getParameters();
         try {
@@ -116,14 +116,14 @@ class UserController extends Controller
     }
 
     #[Get("/profile/{token}/transactions")]
-    public function getTransactionHistory(string $token): Response
+    public function getTransactionHistory(): Response
     {
         $history = $this->transactionService->getTransactions($this->currentUser->id);
         return $this->json($history, 200);
     }
 
     #[Post("/profile/{token}/transactions")]
-    public function performTransaction(string $token): Response
+    public function performTransaction(): Response
     {
         $data = $this->request->getBody()->getParameters();
         try {
@@ -142,7 +142,7 @@ class UserController extends Controller
     }
 
     #[Post("/profile/{token}/elevate")]
-    public function elevateAccount(string $token): Response
+    public function elevateAccount(): Response
     {
         try {
             $this->userService->elevateAccount($this->currentUser->id);
